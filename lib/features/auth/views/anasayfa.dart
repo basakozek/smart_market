@@ -33,12 +33,59 @@ class _HomeState extends State<Home> {
   File? _selectedImage;
   String? _prediction;
 
+  // Map for English to Turkish translations
+  final Map<String, String> _translations = {
+    'Anjou': 'Armut',
+    'Asparagus': 'Kuşkonmaz',
+    'Aubergine': 'Patlıcan',
+    'Avocado': 'Avokado',
+    'Banana': 'Muz',
+    'Beef-Tomato': 'Domates',
+    'Brown-Cap-Mushroom': 'Kahverengi Şapkalı Mantar',
+    'Cabbage': 'Lahana',
+    'Cantaloupe': 'Kavun',
+    'Carrots': 'Havuç',
+    'Conference': 'Konferans Armutu',
+    'Cucumber': 'Salatalık',
+    'Floury-Potato': 'Yemeklik Patates',
+    'Galia-Melon': 'Galya Kavunu',
+    'Garlic': 'Sarımsak',
+    'Golden-Delicious': 'Sarı Elma',
+    'Granny-Smith': 'Yeşil Elma',
+    'Green-Bell-Pepper': 'Yeşil-Biber',
+    'Honeydew-Melon': 'Bal Kavunu',
+    'Kaiser': 'Altın Armut',
+    'Kiwi': 'Kivi',
+    'Leek': 'Pırasa',
+    'Lemon': 'Limon',
+    'Lime': 'Misket Limon',
+    'Mango': 'Mango',
+    'Nectarine': 'Nektarin',
+    'Orange': 'Portakal',
+    'Orange-Bell-Pepper': 'Turuncu Biber',
+    'Peach': 'Şeftali',
+    'Pineapple': 'Ananas',
+    'Pink-Lady': 'Pembe Elma',
+    'Pomegranate': 'Nar',
+    'Red-Bell-Pepper': 'Kırmızı Biber',
+    'Red-Delicious': 'Kırmızı Elma',
+    'Regular-Tomato': 'Salkım Domates',
+    'Royal-Gala': 'Royal Gala Elma',
+    'Solid-Potato': 'Kızartmalık Patates',
+    'Sweet-Potato': 'Tatlı patates',
+    'Vine-Tomato': 'Çeri Domates',
+    'Watermelon': 'Karpuz',
+    'Yellow-Bell-Pepper': 'Sarı Biber',
+    'Yellow-Onion': 'Soğan',
+    'Zucchini': 'Kabak',
+  };
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xff1D1E22),
-        title: const Text('Image Picker'),
+        title: const Text('Resim Yükleme Ekranı'),
         centerTitle: true,
       ),
       body: Center(
@@ -46,7 +93,7 @@ class _HomeState extends State<Home> {
           children: [
             MaterialButton(
               color: Colors.blue,
-              child: const Text("Pick Image from Gallery",
+              child: const Text("Galeriden fotoğraf seç",
                   style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -57,7 +104,7 @@ class _HomeState extends State<Home> {
             ),
             MaterialButton(
               color: Colors.red,
-              child: const Text("Pick Image from Camera",
+              child: const Text("Kameradan fotoğraf çek",
                   style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -71,10 +118,10 @@ class _HomeState extends State<Home> {
             ),
             _selectedImage != null
                 ? Image.file(_selectedImage!)
-                : const Text("Please select an image"),
+                : const Text("Lütfen görsel seçin"),
             MaterialButton(
               color: Colors.green,
-              child: const Text("Send Image",
+              child: const Text("Görseli yükle",
                   style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -85,7 +132,7 @@ class _HomeState extends State<Home> {
             ),
             _prediction != null
                 ? Text(
-                    'Prediction: $_prediction',
+                    'Tahmin: ${_translatePrediction(_prediction!)}',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   )
                 : SizedBox(), // Show prediction if available
@@ -96,7 +143,8 @@ class _HomeState extends State<Home> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => YeniSayfa(prediction: _prediction!),
+                      builder: (context) => YeniSayfa(
+                          prediction: _translatePrediction(_prediction!)),
                     ),
                   );
                 } else {
@@ -124,6 +172,11 @@ class _HomeState extends State<Home> {
     );
   }
 
+  String _translatePrediction(String prediction) {
+    // Check if translation is available, if not return original prediction
+    return _translations[prediction] ?? prediction;
+  }
+
   Future _pickImageFromGallery() async {
     final pickedImage =
         await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -147,14 +200,14 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> _sendImage(File? _image) async {
-    print('Sending image...');
+    print('Resim gönderiliyor...');
 
     if (_image == null) {
-      print('No image selected');
+      print('Seçili bir görsel yok');
       return;
     }
 
-    print('Image path: ${_image.path}');
+    print('Görselin yolu: ${_image.path}');
 
     final url = 'http://10.0.2.2:5000/predict'; // Update with your server URL
 
@@ -174,9 +227,11 @@ class _HomeState extends State<Home> {
         setState(() {
           _prediction = prediction;
         });
-        print('Prediction: $prediction');
+        print('Tahmin: $prediction');
       } else {
-        print('Failed to send image. Status code: ${response.statusCode}');
+        print('Görsel gönderme başarısız. Status code: ${response.statusCode}');
+        // Print response body for further debugging
+        print('Response body: ${response.body}');
       }
     } catch (e) {
       print('Error sending image: $e');

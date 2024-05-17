@@ -56,18 +56,54 @@ class _SepetimState extends State<Sepetim> {
             });
           });
 
-          return ListView(
-            children: sepetItems.entries.map((entry) {
-              return ListTile(
-                title: Row(
-                  children: [
-                    Expanded(
-                      child: Text('${entry.key}: ${entry.value}'),
-                    ),
-                  ],
+          return ListView.builder(
+            itemCount: sepetItems.length,
+            itemBuilder: (context, index) {
+              final item = sepetItems.keys.elementAt(index);
+              final count = sepetItems[item];
+              return Dismissible(
+                key: Key(item),
+                onDismissed: (direction) {
+                  // Öğeyi sepetten kaldır
+                  setState(() {
+                    sepetItems.remove(item);
+                  });
+                  // Firebase'den de kaldır
+                  FirebaseFirestore.instance
+                      .collection('selectedSepeteEklenenler')
+                      .where('uid', isEqualTo: currentUser!.uid)
+                      .get()
+                      .then((snapshot) {
+                    snapshot.docs.forEach((doc) {
+                      var items = doc['selectedItems'];
+                      if (items.containsKey(item)) {
+                        items.remove(item);
+                        doc.reference.update({'selectedItems': items});
+                      }
+                    });
+                  });
+                },
+                background: Container(
+                  color: Colors.red,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Icon(
+                          Icons.delete,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                direction: DismissDirection.endToStart,
+                child: ListTile(
+                  title: Text('$item: $count'),
                 ),
               );
-            }).toList(),
+            },
           );
         },
       ),
