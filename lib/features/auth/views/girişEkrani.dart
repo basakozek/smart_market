@@ -5,6 +5,7 @@ import 'icerik.dart'; // Icerik.dart dosyasının import edilmesi gerekiyor
 import 'sepeteEkle.dart';
 import 'sepetim.dart'
     as SepetimPage; // 'sepetim.dart' dosyasını 'SepetimPage' olarak yeniden adlandırdık
+import 'tarifÜret.dart'; // Tarif oluşturma sayfasının import edilmesi
 
 class GirisEkrani extends StatelessWidget {
   const GirisEkrani({Key? key}) : super(key: key);
@@ -89,6 +90,22 @@ class GirisEkrani extends StatelessWidget {
                     },
                     child: Text(
                       'İçeriği Gör',
+                      style: TextStyle(
+                          fontSize: 20), // Yazı boyutu 20 olarak ayarlandı
+                    ),
+                  ),
+                  SizedBox(height: 15), // Butonlar arasında 20 piksel boşluk
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                TarifUret()), // Tarif üretme sayfasına yönlendiriyoruz
+                      );
+                    },
+                    child: Text(
+                      'Tarif Üret',
                       style: TextStyle(
                           fontSize: 20), // Yazı boyutu 20 olarak ayarlandı
                     ),

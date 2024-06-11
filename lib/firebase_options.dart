@@ -53,9 +53,9 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDN58VGkIgoTAy6TPvSVWLSiP_-3x3Qp0k',
-    appId: '1:814795127985:android:8bbc09304d82c8b8177690',
-    messagingSenderId: '814795127985',
+    apiKey: '',
+    appId: '',
+    messagingSenderId: '',
     projectId: 'deneme-a78b2',
     storageBucket: 'deneme-a78b2.appspot.com',
   );
